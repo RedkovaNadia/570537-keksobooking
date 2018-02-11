@@ -4,8 +4,8 @@
 var NUMBER_OF_OFFERS = 8;
 
 // функция, возвращающая рандомный индекс массива
-function getRandomInt(array) {
-  return Math.floor(Math.random() * array.length);
+function getRandomIndex(number) {
+  return Math.floor(Math.random() * number);
 }
 
 // функция копирования массива
@@ -14,7 +14,7 @@ var getCopyOfArray = function (array) {
   return copyOfArray;
 };
 
-var getOffersObject = function (index) {
+var getOfferObject = function (index) {
   return {
     'author': {'avatar': 'img/avatars/user0' + index + '.png'},
     'offer': {},
@@ -25,7 +25,7 @@ var getOffersObject = function (index) {
 
 var offers = [];
 for (var i = 0; i < NUMBER_OF_OFFERS; i++) {
-  offers.push(getOffersObject(i));
+  offers.push(getOfferObject(i));
 }
 
 
