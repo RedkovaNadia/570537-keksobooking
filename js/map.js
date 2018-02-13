@@ -1,14 +1,12 @@
 'use strict';
 
-// количество объектов-объявлений
 var NUMBER_OF_OFFERS = 8;
 var TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленькиц ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
 var TYPES_OF_HOUSE = ['flat', 'house', 'bungalo'];
 var CHECKIN_TIME = ['12:00', '13:00', '14:00'];
 var CHECKOUT_TIME = ['12:00', '13:00', '14:00'];
-
-//добавила исходный массив с удобствами, из которого потом буду составлять массив рандомной длины
 var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
+var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 
 // функция, возвращающая рандомный индекс массива
 function getRandomIndex(number) {
@@ -29,53 +27,57 @@ var getCopyOfArray = function (array) {
 */
 
 var getOfferObject = function (index) {
+  var titlesArrayCopy = TITLES.slice();
 
-  // копия массива, чтобы избежать повтора
-  var copyOfTitlesArray = TITLES.slice();
-
-  // рандомные индексы для 'случайных' значений - потребуются в ф-ции
-  var randomIForTitles = getRandomIndex(TITLES.length);
+  var randomIForTitlesArrayCopy = getRandomIndex(titlesArrayCopy.length);
   var randomIForTypes = getRandomIndex(TYPES_OF_HOUSE.length);
   var randomIForCheckin = getRandomIndex(CHECKIN_TIME.length);
   var randomIForCheckout = getRandomIndex(CHECKOUT_TIME.length);
 
-  var featuresRandomArray = []; // объявляю массив рандомной длины
-  featuresRandomArray.length = getRandomNumber(1, 6); //задаю его случайную длину
+  var featuresArrayCopy = FEATURES.slice();
+  featuresArrayCopy.length = getRandomNumber(1, FEATURES.length);
+  for (var i = 0; i < featuresArrayCopy.length; i++) { // создаю массив рандомной длины
+    var randomIForFeaturesArrayCopy = getRandomIndex(featuresArrayCopy.length);
 
+    var featuresRandomLengthArray = [];
+    featuresRandomLengthArray.push(featuresArrayCopy.splice(randomIForFeaturesArrayCopy, 1));
+  }
+
+  var photosArrayCopy = PHOTOS.slice();
+  var mixedPhotosArray = [];
+  while (mixedPhotosArray.length < PHOTOS.length) { // мешаю новый массив (значения беру из копии исходного)
+    var randomIForPhotosArrayCopy = getRandomIndex(photosArrayCopy.length);
+    mixedPhotosArray.push(photosArrayCopy[randomIForPhotosArrayCopy]);
+    photosArrayCopy.splice(randomIForPhotosArrayCopy, 1);
+  }
 
   return {
     'author': {
       'avatar': 'img/avatars/user0' + (index + 1) + '.png'
     },
-
     'offer': {
-      'title': copyOfTitlesArray[randomIForTitles] // беру рандомный индекс из копии массива (чтобы исключить повтор)
-               copyOfTitlesArray.splice(randomIForTitles, 1), // удаляю текущее рандомное значение
+      'title': titlesArrayCopy.splice(randomIForTitlesArrayCopy, 1), // беру рандомное значение из копии массива для текущего свойства объекта и удаляю его из копии массива
       'address': 'location.x, location.y',
-      'price': getRandomNumber(1000, 1000000), // беру рандомное число из представленного диапазона через ф-цию рандома заданного промежутка
-      'type': TYPES_OF_HOUSE[randomIForTypes], // беру рандомный индекс из массива (слчайность)
-      'room': getRandomNumber(1, 5), // беру рандомное число из представленного диапазона через ф-цию рандома заданного промежутка
-      'guests': getRandomNumber(1, 10), // добавила гостей
+      'price': getRandomNumber(1000, 1000000),
+      'type': TYPES_OF_HOUSE[randomIForTypes],
+      'room': getRandomNumber(1, 5),
+      'guests': getRandomNumber(1, 10), // добавила свойство с гостями
       'checkin': CHECKIN_TIME[randomIForCheckin],
       'checkout': CHECKOUT_TIME[randomIForCheckout],
-      'features': featuresRandomArray.push(FEATURES[getRandomIndex(featuresRandomArray.length)]), // создаю массив рандомной длины
+      'features': featuresRandomLengthArray, // создаю массив рандомной длины - см цикл выше
       'description': '', // добавила пустую строку
-      'photos': []
+      'photos': mixedPhotosArray // массив, сгенерированный из копии исходного массива (произвольный порядок эелементов) - см цикл выше
     },
-
     'location': {
-      'x': getRandomNumber(300, 900)
+      'x': getRandomNumber(300, 900),
       'y': getRandomNumber(150, 500)
     }
-  }
+  };
 };
-
-// вывела некоторые нужные для цикла переменные из ф-ции getOfferObject (иначе линтер ругается, что их не видит в цикле)
-var copyOfTitlesArray = TITLES.slice();
-var randomIForTitles = getRandomIndex(TITLES.length);
 
 var offers = [];
 for (var i = 0; i < NUMBER_OF_OFFERS; i++) {
   offers.push(getOfferObject(i));
-  copyOfTitlesArray.splice(randomIForTitles, 1);// удаляю это рандомное значение из копии массива, чтобы избежать повтора
 }
+// убираю класс у блока
+document.querySelector('.map').classList.remove('map--faded');
