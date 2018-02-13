@@ -36,11 +36,10 @@ var getOfferObject = function (index) {
 
   var featuresArrayCopy = FEATURES.slice();
   featuresArrayCopy.length = getRandomNumber(1, FEATURES.length);
+  var featuresRandomLengthArray = [];
   for (var i = 0; i < featuresArrayCopy.length; i++) { // создаю массив рандомной длины
     var randomIForFeaturesArrayCopy = getRandomIndex(featuresArrayCopy.length);
-
-    var featuresRandomLengthArray = [];
-    featuresRandomLengthArray.push(featuresArrayCopy.splice(randomIForFeaturesArrayCopy, 1));
+    featuresRandomLengthArray.push(featuresArrayCopy.splice(randomIForFeaturesArrayCopy, 1)[0]);
   }
 
   var photosArrayCopy = PHOTOS.slice();
@@ -50,27 +49,28 @@ var getOfferObject = function (index) {
     mixedPhotosArray.push(photosArrayCopy[randomIForPhotosArrayCopy]);
     photosArrayCopy.splice(randomIForPhotosArrayCopy, 1);
   }
-
+  var randomX = getRandomNumber(300, 900);
+  var randomY = getRandomNumber(150, 500);
   return {
     'author': {
       'avatar': 'img/avatars/user0' + (index + 1) + '.png'
     },
     'offer': {
-      'title': titlesArrayCopy.splice(randomIForTitlesArrayCopy, 1), // беру рандомное значение из копии массива для текущего свойства объекта и удаляю его из копии массива
-      'address': 'location.x, location.y',
+      'title': titlesArrayCopy.splice(randomIForTitlesArrayCopy, 1)[0], // беру рандомное значение из копии массива для текущего свойства объекта и удаляю его из копии массива
+      'address': randomX + ',' + randomY,
       'price': getRandomNumber(1000, 1000000),
       'type': TYPES_OF_HOUSE[randomIForTypes],
       'room': getRandomNumber(1, 5),
-      'guests': getRandomNumber(1, 10), // добавила свойство с гостями
+      'guests': getRandomNumber(1, 10),
       'checkin': CHECKIN_TIME[randomIForCheckin],
       'checkout': CHECKOUT_TIME[randomIForCheckout],
-      'features': featuresRandomLengthArray, // создаю массив рандомной длины - см цикл выше
-      'description': '', // добавила пустую строку
-      'photos': mixedPhotosArray // массив, сгенерированный из копии исходного массива (произвольный порядок эелементов) - см цикл выше
+      'features': featuresRandomLengthArray,
+      'description': '',
+      'photos': mixedPhotosArray
     },
     'location': {
-      'x': getRandomNumber(300, 900),
-      'y': getRandomNumber(150, 500)
+      'x': randomX,
+      'y': randomY
     }
   };
 };
@@ -81,3 +81,26 @@ for (var i = 0; i < NUMBER_OF_OFFERS; i++) {
 }
 // убираю класс у блока
 document.querySelector('.map').classList.remove('map--faded');
+
+var mapPins = document.querySelector('.map__pins');
+
+var fragment = document.createDocumentFragment();
+
+for (i = 0; i < offers.length; i++) {
+  var newButtonElement = document.createElement('button');
+  newButtonElement.style.left = (offers[i].location.x + 20) + 'px';
+  newButtonElement.style.top = (offers[i].location.y + 40) + 'px';
+  /*
+  newElement.style = 'left: ' + (offers[i].location.x + 20) + 'px; top: ' + (offers[i].location.y + 40) + 'px;';
+   */
+  newButtonElement.className = 'map__pin';
+
+  var newImgElement = document.createElement('img');
+  newImgElement.src = offers[i].author.avatar;
+  newImgElement.width = 40;
+  newImgElement.height = 40;
+  newImgElement.draggable = false;
+  newButtonElement.appendChild(newImgElement);
+  fragment.appendChild(newButtonElement);
+}
+mapPins.appendChild(fragment);
