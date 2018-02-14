@@ -26,6 +26,17 @@ var getCopyOfArray = function (array) {
 };
 */
 
+var shuffleArray = function (array) { // ф-ция, которая мешает массив
+  var arrayCopy = array.slice();
+  var mixedArray = [];
+  while (mixedArray.length < array.length) {
+    var randomIndex = getRandomIndex(arrayCopy.length);
+    mixedArray.push(arrayCopy[randomIndex]);
+    arrayCopy.splice(randomIndex, 1);
+  }
+  return mixedArray;
+};
+
 var getOfferObject = function (index) {
   var titlesArrayCopy = TITLES.slice();
 
@@ -34,21 +45,12 @@ var getOfferObject = function (index) {
   var randomIForCheckin = getRandomIndex(CHECKIN_TIME.length);
   var randomIForCheckout = getRandomIndex(CHECKOUT_TIME.length);
 
-  var featuresArrayCopy = FEATURES.slice();
-  featuresArrayCopy.length = getRandomNumber(1, FEATURES.length);
-  var featuresRandomLengthArray = [];
-  for (var i = 0; i < featuresArrayCopy.length; i++) { // создаю массив рандомной длины
-    var randomIForFeaturesArrayCopy = getRandomIndex(featuresArrayCopy.length);
-    featuresRandomLengthArray.push(featuresArrayCopy.splice(randomIForFeaturesArrayCopy, 1)[0]);
+  var featuresArrayShuffleCopy = shuffleArray(FEATURES);
+  for (var i = 0; i <= getRandomIndex(featuresArrayShuffleCopy.length); i++) { // создаю массив рандомной длины
+    featuresArrayShuffleCopy.splice(i, 1);
   }
 
-  var photosArrayCopy = PHOTOS.slice();
-  var mixedPhotosArray = [];
-  while (mixedPhotosArray.length < PHOTOS.length) { // мешаю новый массив (значения беру из копии исходного)
-    var randomIForPhotosArrayCopy = getRandomIndex(photosArrayCopy.length);
-    mixedPhotosArray.push(photosArrayCopy[randomIForPhotosArrayCopy]);
-    photosArrayCopy.splice(randomIForPhotosArrayCopy, 1);
-  }
+  var mixedPhotosArray = shuffleArray(PHOTOS);
   var randomX = getRandomNumber(300, 900);
   var randomY = getRandomNumber(150, 500);
   return {
@@ -64,7 +66,7 @@ var getOfferObject = function (index) {
       'guests': getRandomNumber(1, 10),
       'checkin': CHECKIN_TIME[randomIForCheckin],
       'checkout': CHECKOUT_TIME[randomIForCheckout],
-      'features': featuresRandomLengthArray,
+      'features': featuresArrayShuffleCopy,
       'description': '',
       'photos': mixedPhotosArray
     },
@@ -158,12 +160,9 @@ var renderOfferCard = function (object) {
   // удаляю иконки из шаблона, которые идут по умолчанию
   var ulBlock = authorOfferCardElement.querySelectorAll('ul');
   var liBlockFirst = ulBlock[0].querySelectorAll('.feature');
-  ulBlock[0].removeChild(liBlockFirst[0]);
-  ulBlock[0].removeChild(liBlockFirst[1]);
-  ulBlock[0].removeChild(liBlockFirst[2]);
-  ulBlock[0].removeChild(liBlockFirst[3]);
-  ulBlock[0].removeChild(liBlockFirst[4]);
-  ulBlock[0].removeChild(liBlockFirst[5]);
+  for (i = 0; i <= 5; i++) {
+    ulBlock[0].removeChild(liBlockFirst[i]);
+  }
   // создаю фрагмент для <li>
   var fragmentSecond = document.createDocumentFragment();
   for (i = 0; i < object.offer.features.length; i++) {
