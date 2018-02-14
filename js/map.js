@@ -82,10 +82,39 @@ for (var i = 0; i < NUMBER_OF_OFFERS; i++) {
 // убираю класс у блока
 document.querySelector('.map').classList.remove('map--faded');
 
-// метки на карте
+// создаю метку на карте
 var mapPins = document.querySelector('.map__pins');
 
-var fragment = document.createDocumentFragment();
+var fragmentFirst = document.createDocumentFragment();
+
+var createButtonElement = function (object) {
+  var newButtonElement = document.createElement('button');
+  newButtonElement.style.left = (object.location.x + 20) + 'px';
+  newButtonElement.style.top = (object.location.y + 40) + 'px';
+  newButtonElement.className = 'map__pin';
+
+  var newImgElement = document.createElement('img');
+  newImgElement.src = object.author.avatar;
+  newImgElement.width = 40;
+  newImgElement.height = 40;
+  newImgElement.draggable = false;
+
+  newButtonElement.appendChild(newImgElement);
+  return newButtonElement;
+};
+// добиваюсь нужного мне количества меток при помощи цикла
+for (i = 0; i < offers.length; i++) {
+  fragmentFirst.appendChild(createButtonElement(offers[i]));
+}
+
+mapPins.appendChild(fragmentFirst);
+
+/*
+старый вариант создания метки (без ф-ции)
+
+var mapPins = document.querySelector('.map__pins');
+
+var fragmentFirst = document.createDocumentFragment();
 
 for (i = 0; i < offers.length; i++) {
   var newButtonElement = document.createElement('button');
@@ -99,23 +128,91 @@ for (i = 0; i < offers.length; i++) {
   newImgElement.height = 40;
   newImgElement.draggable = false;
   newButtonElement.appendChild(newImgElement);
-  fragment.appendChild(newButtonElement);
+  fragmentFirst.appendChild(newButtonElement);
 }
-mapPins.appendChild(fragment);
+mapPins.appendChild(fragmentFirst);
+*/
 
 //  dom-элемент объяления
-var offerCardTemplate = document.querySelector('template').content.querySelector('article.map__card');
-var authorOfferCardElement = offerCardTemplate.cloneNode(true);
-authorOfferCardElement.querySelector('h3').textContent = offers[0].offer.title;
-authorOfferCardElement.querySelector('small').textContent = offers[0].offer.address;
-authorOfferCardElement.querySelector('.popup__price').innerHTML = offers[0].offer.price + '&#x20bd;/ночь';
-// тут будет тип жилья
-authorOfferCardElement.children[6].textContent = offers[0].offer.rooms + ' комнаты для ' + offers[0].offer.guests + ' гостей';
-authorOfferCardElement.children[7].textContent = 'Заезд после ' + offers[0].offer.checkin + ' , выезд до: ' + offers[0].offer.checkout;
 
-for (i = 0; i < offers[0].offer.features.length; i++) {
-  authorOfferCardElement.querySelector('.popup__features').innerHTML = offers[0].offer.features[i];
-}
-authorOfferCardElement.children[9].textContent = offers[0].offer.description;
-// тут будут фото
-document.querySelector('.map').insertBefore(authorOfferCardElement, document.querySelector('.map__filters-container'));
+var offerCardTemplate = document.querySelector('template').content.querySelector('article.map__card');
+
+var renderOfferCard = function (object) {
+  var authorOfferCardElement = offerCardTemplate.cloneNode(true);
+  authorOfferCardElement.querySelector('h3').textContent = object.offer.title;
+  authorOfferCardElement.querySelector('small').textContent = object.offer.address;
+  authorOfferCardElement.querySelector('.popup__price').innerHTML = object.offer.price + '&#x20bd;/ночь';
+  // в блок h4 вывожу тип жилья
+  if (object.offer.type === 'flat') {
+    authorOfferCardElement.querySelector('h4').textContent = 'Квартира';
+  }
+  if (object.offer.type === 'bungalo') {
+    authorOfferCardElement.querySelector('h4').textContent = 'Бунгало';
+  }
+  if (object.offer.type === 'house') {
+    authorOfferCardElement.querySelector('h4').textContent = 'Дом';
+  }
+  authorOfferCardElement.children[6].textContent = object.offer.rooms + ' комнаты для ' + object.offer.guests + ' гостей';
+  authorOfferCardElement.children[7].textContent = 'Заезд после ' + object.offer.checkin + ' , выезд до ' + object.offer.checkout;
+  authorOfferCardElement.children[9].textContent = object.offer.description;
+  // удаляю иконки из шаблона, которые идут по умолчанию
+  var ulBlock = authorOfferCardElement.querySelectorAll('ul');
+  var liBlockFirst = ulBlock[0].querySelectorAll('.feature');
+  ulBlock[0].removeChild(liBlockFirst[0]);
+  ulBlock[0].removeChild(liBlockFirst[1]);
+  ulBlock[0].removeChild(liBlockFirst[2]);
+  ulBlock[0].removeChild(liBlockFirst[3]);
+  ulBlock[0].removeChild(liBlockFirst[4]);
+  ulBlock[0].removeChild(liBlockFirst[5]);
+  // создаю фрагмент для <li>
+  var fragmentSecond = document.createDocumentFragment();
+  for (i = 0; i < object.offer.features.length; i++) {
+    var newLiElementFirst = document.createElement('li');
+    if (object.offer.features[i] === 'wifi') {
+      newLiElementFirst.className = 'feature feature--wifi';
+      fragmentSecond.appendChild(newLiElementFirst);
+    }
+    if (object.offer.features[i] === 'dishwasher') {
+      newLiElementFirst.className = 'feature feature--dishwasher';
+      fragmentSecond.appendChild(newLiElementFirst);
+    }
+    if (object.offer.features[i] === 'parking') {
+      newLiElementFirst.className = 'feature feature--parking';
+      fragmentSecond.appendChild(newLiElementFirst);
+    }
+    if (object.offer.features[i] === 'washer') {
+      newLiElementFirst.className = 'feature feature--washer';
+      fragmentSecond.appendChild(newLiElementFirst);
+    }
+    if (object.offer.features[i] === 'elevator') {
+      newLiElementFirst.className = 'feature feature--elevator';
+      fragmentSecond.appendChild(newLiElementFirst);
+    }
+    if (object.offer.features[i] === 'conditioner') {
+      newLiElementFirst.className = 'feature feature--conditioner';
+      fragmentSecond.appendChild(newLiElementFirst);
+    }
+    // добавляю <li> в нужный блок
+    ulBlock[0].appendChild(fragmentSecond);
+  }
+  // удаляю строку <li> из шаблона
+  var liBlockSecond = ulBlock[1].querySelector('li');
+  ulBlock[1].removeChild(liBlockSecond);
+  // создаю фрагмент для <li> и вложенного в него <img>
+  var fragmentThird = document.createDocumentFragment();
+  for (i = 0; i < offers[0].offer.photos.length; i++) {
+    var newLiElementSecond = document.createElement('li');
+    var newImgElementForLi = document.createElement('img');
+    newImgElementForLi.src = object.offer.photos[i];
+    newImgElementForLi.width = 70;
+    newImgElementForLi.height = 70;
+    newLiElementSecond.appendChild(newImgElementForLi);
+    fragmentThird.appendChild(newLiElementSecond);
+  }
+  // вывожу фрагмент в нужный блок
+  ulBlock[1].appendChild(fragmentThird);
+  return authorOfferCardElement;
+};
+
+document.querySelector('.map').insertBefore(renderOfferCard(offers[0]), document.querySelector('.map__filters-container'));
+
