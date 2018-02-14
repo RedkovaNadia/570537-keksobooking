@@ -168,33 +168,11 @@ var renderOfferCard = function (object) {
   var fragmentSecond = document.createDocumentFragment();
   for (i = 0; i < object.offer.features.length; i++) {
     var newLiElementFirst = document.createElement('li');
-    if (object.offer.features[i] === 'wifi') {
-      newLiElementFirst.className = 'feature feature--wifi';
-      fragmentSecond.appendChild(newLiElementFirst);
-    }
-    if (object.offer.features[i] === 'dishwasher') {
-      newLiElementFirst.className = 'feature feature--dishwasher';
-      fragmentSecond.appendChild(newLiElementFirst);
-    }
-    if (object.offer.features[i] === 'parking') {
-      newLiElementFirst.className = 'feature feature--parking';
-      fragmentSecond.appendChild(newLiElementFirst);
-    }
-    if (object.offer.features[i] === 'washer') {
-      newLiElementFirst.className = 'feature feature--washer';
-      fragmentSecond.appendChild(newLiElementFirst);
-    }
-    if (object.offer.features[i] === 'elevator') {
-      newLiElementFirst.className = 'feature feature--elevator';
-      fragmentSecond.appendChild(newLiElementFirst);
-    }
-    if (object.offer.features[i] === 'conditioner') {
-      newLiElementFirst.className = 'feature feature--conditioner';
-      fragmentSecond.appendChild(newLiElementFirst);
-    }
-    // добавляю <li> в нужный блок
-    ulBlock[0].appendChild(fragmentSecond);
+    newLiElementFirst.className = 'feature feature--' + object.offer.features[i];
+    fragmentSecond.appendChild(newLiElementFirst);
   }
+  // добавляю <li> в нужный блок
+  ulBlock[0].appendChild(fragmentSecond);
   // удаляю строку <li> из шаблона
   var liBlockSecond = ulBlock[1].querySelector('li');
   ulBlock[1].removeChild(liBlockSecond);
