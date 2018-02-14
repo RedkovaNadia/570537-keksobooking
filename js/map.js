@@ -1,7 +1,7 @@
 'use strict';
 
 var NUMBER_OF_OFFERS = 8;
-var TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленькиц ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
+var TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
 var TYPES_OF_HOUSE = ['flat', 'house', 'bungalo'];
 var CHECKIN_TIME = ['12:00', '13:00', '14:00'];
 var CHECKOUT_TIME = ['12:00', '13:00', '14:00'];
@@ -60,7 +60,7 @@ var getOfferObject = function (index) {
       'address': randomX + ',' + randomY,
       'price': getRandomNumber(1000, 1000000),
       'type': TYPES_OF_HOUSE[randomIForTypes],
-      'room': getRandomNumber(1, 5),
+      'rooms': getRandomNumber(1, 5),
       'guests': getRandomNumber(1, 10),
       'checkin': CHECKIN_TIME[randomIForCheckin],
       'checkout': CHECKOUT_TIME[randomIForCheckout],
@@ -82,6 +82,7 @@ for (var i = 0; i < NUMBER_OF_OFFERS; i++) {
 // убираю класс у блока
 document.querySelector('.map').classList.remove('map--faded');
 
+// метки на карте
 var mapPins = document.querySelector('.map__pins');
 
 var fragment = document.createDocumentFragment();
@@ -90,9 +91,6 @@ for (i = 0; i < offers.length; i++) {
   var newButtonElement = document.createElement('button');
   newButtonElement.style.left = (offers[i].location.x + 20) + 'px';
   newButtonElement.style.top = (offers[i].location.y + 40) + 'px';
-  /*
-  newElement.style = 'left: ' + (offers[i].location.x + 20) + 'px; top: ' + (offers[i].location.y + 40) + 'px;';
-   */
   newButtonElement.className = 'map__pin';
 
   var newImgElement = document.createElement('img');
@@ -104,3 +102,20 @@ for (i = 0; i < offers.length; i++) {
   fragment.appendChild(newButtonElement);
 }
 mapPins.appendChild(fragment);
+
+//  dom-элемент объяления
+var offerCardTemplate = document.querySelector('template').content.querySelector('article.map__card');
+var authorOfferCardElement = offerCardTemplate.cloneNode(true);
+authorOfferCardElement.querySelector('h3').textContent = offers[0].offer.title;
+authorOfferCardElement.querySelector('small').textContent = offers[0].offer.address;
+authorOfferCardElement.querySelector('.popup__price').innerHTML = offers[0].offer.price + '&#x20bd;/ночь';
+// тут будет тип жилья
+authorOfferCardElement.children[6].textContent = offers[0].offer.rooms + ' комнаты для ' + offers[0].offer.guests + ' гостей';
+authorOfferCardElement.children[7].textContent = 'Заезд после ' + offers[0].offer.checkin + ' , выезд до: ' + offers[0].offer.checkout;
+
+for (i = 0; i < offers[0].offer.features.length; i++) {
+  authorOfferCardElement.querySelector('.popup__features').innerHTML = offers[0].offer.features[i];
+}
+authorOfferCardElement.children[9].textContent = offers[0].offer.description;
+// тут будут фото
+document.querySelector('.map').insertBefore(authorOfferCardElement, document.querySelector('.map__filters-container'));
