@@ -46,9 +46,7 @@ var getOfferObject = function (index) {
   var randomIForCheckout = getRandomIndex(CHECKOUT_TIME.length);
 
   var featuresArrayShuffleCopy = shuffleArray(FEATURES);
-  for (var i = 0; i <= getRandomIndex(featuresArrayShuffleCopy.length); i++) { // создаю массив рандомной длины
-    featuresArrayShuffleCopy.splice(i, 1);
-  }
+  featuresArrayShuffleCopy.splice(0, getRandomIndex(featuresArrayShuffleCopy.length));
 
   var mixedPhotosArray = shuffleArray(PHOTOS);
   var randomX = getRandomNumber(300, 900);
@@ -188,6 +186,7 @@ var renderOfferCard = function (object) {
   }
   // вывожу фрагмент в нужный блок
   ulBlock[1].appendChild(fragmentThird);
+  authorOfferCardElement.querySelector('.popup__avatar').src = object.author.avatar;
   return authorOfferCardElement;
 };
 
