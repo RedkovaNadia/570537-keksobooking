@@ -152,7 +152,7 @@ var getTypeOfHouse = function (offerType, element) {
       break;
   }
   element.querySelector('h4').textContent = typeOfHouse;
-}
+};
 
 var renderOfferCard = function (object) {
   var authorOfferCardElement = offerCardTemplate.cloneNode(true);
