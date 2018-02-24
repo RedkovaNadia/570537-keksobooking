@@ -77,7 +77,6 @@ document.querySelector('.map').classList.remove('map--faded');
 // создаю метку на карте
 var mapPins = document.querySelector('.map__pins');
 
-var documentFragment = document.createDocumentFragment();
 
 var createButtonElement = function (object) {
   var newButtonElement = document.createElement('button');
@@ -94,12 +93,17 @@ var createButtonElement = function (object) {
   newButtonElement.appendChild(newImgElement);
   return newButtonElement;
 };
-// добиваюсь нужного мне количества меток при помощи цикла
-for (i = 0; i < offers.length; i++) {
-  documentFragment .appendChild(createButtonElement(offers[i]));
-}
 
-mapPins.appendChild(documentFragment);
+// добиваюсь нужного мне количества меток при помощи ф-ции с циклом внутри, вставляю каждую во фрагмент и далее - в DOM
+var setElementInto = function () {
+  var documentFragment = document.createDocumentFragment();
+  for (i = 0; i < offers.length; i++) {
+    documentFragment.appendChild(createButtonElement(offers[i]));
+  }
+  mapPins.appendChild(documentFragment);
+};
+// вызываю эту ф-цию
+setElementInto();
 
 //  dom-элемент объяления
 
@@ -132,7 +136,7 @@ var getFeaturesArrayElement = function (featuresElement, offerFeaturesArray) {
     featuresElement.removeChild(featureElement[i]);
   }
   // создаю фрагмент для <li>
-  documentFragment = document.createDocumentFragment();
+  var documentFragment = document.createDocumentFragment();
   for (i = 0; i < offerFeaturesArray.length; i++) {
     var newFeatureElement = document.createElement('li');
     newFeatureElement.className = 'feature feature--' + offerFeaturesArray[i];
@@ -161,7 +165,7 @@ var renderOfferCard = function (object) {
   var pictureElement = picturesElement.querySelector('li');
   picturesElement.removeChild(pictureElement);
   // создаю фрагмент для <li> и вложенного в него <img>
-  documentFragment = document.createDocumentFragment();
+  var documentFragment = document.createDocumentFragment();
   for (i = 0; i < offers[0].offer.photos.length; i++) {
     var newLiElementSecond = document.createElement('li');
     var newImgElementForLi = document.createElement('img');
