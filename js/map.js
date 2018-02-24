@@ -18,14 +18,6 @@ function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-/*
-// функция копирования массива - пока оставлю, (сейчас без нее обхожусь)
-var getCopyOfArray = function (array) {
-  var copyOfArray = array.slice();
-  return copyOfArray;
-};
-*/
-
 var shuffleArray = function (array) { // ф-ция, которая мешает массив
   var arrayCopy = array.slice();
   var mixedArray = [];
@@ -85,7 +77,7 @@ document.querySelector('.map').classList.remove('map--faded');
 // создаю метку на карте
 var mapPins = document.querySelector('.map__pins');
 
-var fragmentFirst = document.createDocumentFragment();
+var documentFragment = document.createDocumentFragment();
 
 var createButtonElement = function (object) {
   var newButtonElement = document.createElement('button');
@@ -104,42 +96,19 @@ var createButtonElement = function (object) {
 };
 // добиваюсь нужного мне количества меток при помощи цикла
 for (i = 0; i < offers.length; i++) {
-  fragmentFirst.appendChild(createButtonElement(offers[i]));
+  documentFragment .appendChild(createButtonElement(offers[i]));
 }
 
-mapPins.appendChild(fragmentFirst);
-
-/*
-старый вариант создания метки (без ф-ции)
-
-var mapPins = document.querySelector('.map__pins');
-
-var fragmentFirst = document.createDocumentFragment();
-
-for (i = 0; i < offers.length; i++) {
-  var newButtonElement = document.createElement('button');
-  newButtonElement.style.left = (offers[i].location.x + 20) + 'px';
-  newButtonElement.style.top = (offers[i].location.y + 40) + 'px';
-  newButtonElement.className = 'map__pin';
-
-  var newImgElement = document.createElement('img');
-  newImgElement.src = offers[i].author.avatar;
-  newImgElement.width = 40;
-  newImgElement.height = 40;
-  newImgElement.draggable = false;
-  newButtonElement.appendChild(newImgElement);
-  fragmentFirst.appendChild(newButtonElement);
-}
-mapPins.appendChild(fragmentFirst);
-*/
+mapPins.appendChild(documentFragment);
 
 //  dom-элемент объяления
 
 var offerCardTemplate = document.querySelector('template').content.querySelector('article.map__card');
 
-var getTypeOfHouse = function (offerTypeArrayElement) {
+// ф-ция, проверяющая тип жилища
+var getTypeOfHouse = function (offerType) {
   var typeOfHouse;
-  switch (offerTypeArrayElement) {
+  switch (offerType) {
     case 'flat':
       typeOfHouse = 'Квартира';
       break;
@@ -154,23 +123,23 @@ var getTypeOfHouse = function (offerTypeArrayElement) {
   }
   return typeOfHouse;
 };
-
-var getFeaturesArrayElement = function (blockNecessary, offerFeaturesArray) {
+//  ф-ция манипуляций с фичами
+var getFeaturesArrayElement = function (featuresElement, offerFeaturesArray) {
 
   // удаляю иконки из шаблона, которые идут по умолчанию
-  var liBlockFirst = blockNecessary.querySelectorAll('.feature');
+  var featureElement = featuresElement.querySelectorAll('.feature');
   for (i = 0; i <= 5; i++) {
-    blockNecessary.removeChild(liBlockFirst[i]);
+    featuresElement.removeChild(featureElement[i]);
   }
   // создаю фрагмент для <li>
-  var fragmentSecond = document.createDocumentFragment();
+  documentFragment = document.createDocumentFragment();
   for (i = 0; i < offerFeaturesArray.length; i++) {
-    var newLiElementFirst = document.createElement('li');
-    newLiElementFirst.className = 'feature feature--' + offerFeaturesArray[i];
-    fragmentSecond.appendChild(newLiElementFirst);
+    var newFeatureElement = document.createElement('li');
+    newFeatureElement.className = 'feature feature--' + offerFeaturesArray[i];
+    documentFragment.appendChild(newFeatureElement);
   }
   // добавляю <li> в нужный блок
-  blockNecessary.appendChild(fragmentSecond);
+  featuresElement.appendChild(documentFragment);
 };
 
 var renderOfferCard = function (object) {
@@ -183,31 +152,16 @@ var renderOfferCard = function (object) {
   authorOfferCardElement.children[6].textContent = object.offer.rooms + ' комнаты для ' + object.offer.guests + ' гостей';
   authorOfferCardElement.children[7].textContent = 'Заезд после ' + object.offer.checkin + ' , выезд до ' + object.offer.checkout;
   authorOfferCardElement.children[9].textContent = object.offer.description;
-  /*
-  // удаляю иконки из шаблона, которые идут по умолчанию
-  var ulBlock = authorOfferCardElement.querySelectorAll('ul');
-  var liBlockFirst = ulBlock[0].querySelectorAll('.feature');
-  for (i = 0; i <= 5; i++) {
-    ulBlock[0].removeChild(liBlockFirst[i]);
-  }
-  // создаю фрагмент для <li>
-  var fragmentSecond = document.createDocumentFragment();
-  for (i = 0; i < object.offer.features.length; i++) {
-    var newLiElementFirst = document.createElement('li');
-    newLiElementFirst.className = 'feature feature--' + object.offer.features[i];
-    fragmentSecond.appendChild(newLiElementFirst);
-  }
-  // добавляю <li> в нужный блок
-  ulBlock[0].appendChild(fragmentSecond);
-*/
+
   // вызов ф-ции фич
-  var ulBlock = authorOfferCardElement.querySelectorAll('ul');
-  getFeaturesArrayElement(ulBlock[0], object.offer.features);
+  var featuresElement = authorOfferCardElement.querySelector('.popup__features');
+  getFeaturesArrayElement(featuresElement, object.offer.features);
   // удаляю строку <li> из шаблона
-  var liBlockSecond = ulBlock[1].querySelector('li');
-  ulBlock[1].removeChild(liBlockSecond);
+  var picturesElement = authorOfferCardElement.querySelector('.popup__pictures');
+  var pictureElement = picturesElement.querySelector('li');
+  picturesElement.removeChild(pictureElement);
   // создаю фрагмент для <li> и вложенного в него <img>
-  var fragmentThird = document.createDocumentFragment();
+  documentFragment = document.createDocumentFragment();
   for (i = 0; i < offers[0].offer.photos.length; i++) {
     var newLiElementSecond = document.createElement('li');
     var newImgElementForLi = document.createElement('img');
@@ -215,10 +169,10 @@ var renderOfferCard = function (object) {
     newImgElementForLi.width = 70;
     newImgElementForLi.height = 70;
     newLiElementSecond.appendChild(newImgElementForLi);
-    fragmentThird.appendChild(newLiElementSecond);
+    documentFragment.appendChild(newLiElementSecond);
   }
   // вывожу фрагмент в нужный блок
-  ulBlock[1].appendChild(fragmentThird);
+  picturesElement.appendChild(documentFragment);
   authorOfferCardElement.querySelector('.popup__avatar').src = object.author.avatar;
   return authorOfferCardElement;
 };
