@@ -137,10 +137,11 @@ mapPins.appendChild(fragmentFirst);
 
 var offerCardTemplate = document.querySelector('template').content.querySelector('article.map__card');
 
-var getTypeOfHouse = function (offerType, element) {
-  switch (offerType) {
+var getTypeOfHouse = function (offerTypeArrayElement) {
+  var typeOfHouse;
+  switch (offerTypeArrayElement) {
     case 'flat':
-      var typeOfHouse = 'Квартира';
+      typeOfHouse = 'Квартира';
       break;
 
     case 'bungalo':
@@ -151,7 +152,25 @@ var getTypeOfHouse = function (offerType, element) {
       typeOfHouse = 'Дом';
       break;
   }
-  element.querySelector('h4').textContent = typeOfHouse;
+  return typeOfHouse;
+};
+
+var getFeaturesArrayElement = function (blockNecessary, offerFeaturesArray) {
+
+  // удаляю иконки из шаблона, которые идут по умолчанию
+  var liBlockFirst = blockNecessary.querySelectorAll('.feature');
+  for (i = 0; i <= 5; i++) {
+    blockNecessary.removeChild(liBlockFirst[i]);
+  }
+  // создаю фрагмент для <li>
+  var fragmentSecond = document.createDocumentFragment();
+  for (i = 0; i < offerFeaturesArray.length; i++) {
+    var newLiElementFirst = document.createElement('li');
+    newLiElementFirst.className = 'feature feature--' + offerFeaturesArray[i];
+    fragmentSecond.appendChild(newLiElementFirst);
+  }
+  // добавляю <li> в нужный блок
+  blockNecessary.appendChild(fragmentSecond);
 };
 
 var renderOfferCard = function (object) {
@@ -159,11 +178,12 @@ var renderOfferCard = function (object) {
   authorOfferCardElement.querySelector('h3').textContent = object.offer.title;
   authorOfferCardElement.querySelector('small').textContent = object.offer.address;
   authorOfferCardElement.querySelector('.popup__price').innerHTML = object.offer.price + '&#x20bd;/ночь';
-  // в блок h4 вывожу тип жилья
-  getTypeOfHouse(object.offer.type, authorOfferCardElement);
+  // в блок h4 вывожу тип жилья через вызов ф-ции типа дома
+  authorOfferCardElement.querySelector('h4').textContent = getTypeOfHouse(object.offer.type);
   authorOfferCardElement.children[6].textContent = object.offer.rooms + ' комнаты для ' + object.offer.guests + ' гостей';
   authorOfferCardElement.children[7].textContent = 'Заезд после ' + object.offer.checkin + ' , выезд до ' + object.offer.checkout;
   authorOfferCardElement.children[9].textContent = object.offer.description;
+  /*
   // удаляю иконки из шаблона, которые идут по умолчанию
   var ulBlock = authorOfferCardElement.querySelectorAll('ul');
   var liBlockFirst = ulBlock[0].querySelectorAll('.feature');
@@ -179,6 +199,10 @@ var renderOfferCard = function (object) {
   }
   // добавляю <li> в нужный блок
   ulBlock[0].appendChild(fragmentSecond);
+*/
+  // вызов ф-ции фич
+  var ulBlock = authorOfferCardElement.querySelectorAll('ul');
+  getFeaturesArrayElement(ulBlock[0], object.offer.features);
   // удаляю строку <li> из шаблона
   var liBlockSecond = ulBlock[1].querySelector('li');
   ulBlock[1].removeChild(liBlockSecond);
