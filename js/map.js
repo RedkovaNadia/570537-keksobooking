@@ -137,25 +137,30 @@ mapPins.appendChild(fragmentFirst);
 
 var offerCardTemplate = document.querySelector('template').content.querySelector('article.map__card');
 
+var getTypeOfHouse = function (offerType, element) {
+  switch (offerType) {
+    case 'flat':
+      var typeOfHouse = 'Квартира';
+      break;
+
+    case 'bungalo':
+      typeOfHouse = 'Бунгало';
+      break;
+
+    case 'house':
+      typeOfHouse = 'Дом';
+      break;
+  }
+  element.querySelector('h4').textContent = typeOfHouse;
+}
+
 var renderOfferCard = function (object) {
   var authorOfferCardElement = offerCardTemplate.cloneNode(true);
   authorOfferCardElement.querySelector('h3').textContent = object.offer.title;
   authorOfferCardElement.querySelector('small').textContent = object.offer.address;
   authorOfferCardElement.querySelector('.popup__price').innerHTML = object.offer.price + '&#x20bd;/ночь';
   // в блок h4 вывожу тип жилья
-  switch (object.offer.type) {
-    case 'flat':
-      authorOfferCardElement.querySelector('h4').textContent = 'Квартира';
-      break;
-
-    case 'bungalo':
-      authorOfferCardElement.querySelector('h4').textContent = 'Бунгало';
-      break;
-
-    case 'house':
-      authorOfferCardElement.querySelector('h4').textContent = 'Дом';
-      break;
-  }
+  getTypeOfHouse(object.offer.type, authorOfferCardElement);
   authorOfferCardElement.children[6].textContent = object.offer.rooms + ' комнаты для ' + object.offer.guests + ' гостей';
   authorOfferCardElement.children[7].textContent = 'Заезд после ' + object.offer.checkin + ' , выезд до ' + object.offer.checkout;
   authorOfferCardElement.children[9].textContent = object.offer.description;
