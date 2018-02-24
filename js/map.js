@@ -143,14 +143,18 @@ var renderOfferCard = function (object) {
   authorOfferCardElement.querySelector('small').textContent = object.offer.address;
   authorOfferCardElement.querySelector('.popup__price').innerHTML = object.offer.price + '&#x20bd;/ночь';
   // в блок h4 вывожу тип жилья
-  if (object.offer.type === 'flat') {
-    authorOfferCardElement.querySelector('h4').textContent = 'Квартира';
-  }
-  if (object.offer.type === 'bungalo') {
-    authorOfferCardElement.querySelector('h4').textContent = 'Бунгало';
-  }
-  if (object.offer.type === 'house') {
-    authorOfferCardElement.querySelector('h4').textContent = 'Дом';
+  switch (object.offer.type) {
+    case 'flat':
+      authorOfferCardElement.querySelector('h4').textContent = 'Квартира';
+      break;
+
+    case 'bungalo':
+      authorOfferCardElement.querySelector('h4').textContent = 'Бунгало';
+      break;
+
+    case 'house':
+      authorOfferCardElement.querySelector('h4').textContent = 'Дом';
+      break;
   }
   authorOfferCardElement.children[6].textContent = object.offer.rooms + ' комнаты для ' + object.offer.guests + ' гостей';
   authorOfferCardElement.children[7].textContent = 'Заезд после ' + object.offer.checkin + ' , выезд до ' + object.offer.checkout;
