@@ -95,15 +95,13 @@ var createButtonElement = function (object) {
 };
 
 // добиваюсь нужного мне количества меток при помощи ф-ции с циклом внутри, вставляю каждую во фрагмент и далее - в DOM
-var setElementInto = function () {
+var renderPins = function () {
   var documentFragment = document.createDocumentFragment();
   for (i = 0; i < offers.length; i++) {
     documentFragment.appendChild(createButtonElement(offers[i]));
   }
   mapPins.appendChild(documentFragment);
 };
-// вызываю эту ф-цию
-setElementInto();
 
 //  dom-элемент объяления
 
@@ -182,4 +180,7 @@ var renderOfferCard = function (object) {
 };
 
 document.querySelector('.map').insertBefore(renderOfferCard(offers[0]), document.querySelector('.map__filters-container'));
+
+// вызываю ф-цию отрисовки меток
+renderPins();
 
