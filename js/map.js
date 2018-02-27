@@ -9,7 +9,8 @@ var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditio
 var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 // переменные с номерами клавиш
 var ESC_KEYCODE = 27;
-var ENTER_KEYCODE = 13;
+// var ENTER_KEYCODE = 13;
+
 // функция, возвращающая рандомный индекс массива
 function getRandomIndex(number) {
   return Math.floor(Math.random() * number);
@@ -78,8 +79,6 @@ for (var i = 0; i < NUMBER_OF_OFFERS; i++) {
 
 //  dom-элемент объяления
 
-var offerCardTemplate = document.querySelector('template').content.querySelector('article.map__card');
-
 // ф-ция, проверяющая тип жилища
 var getTypeOfHouse = function (offerType) {
   var typeOfHouse;
@@ -116,6 +115,9 @@ var getFeaturesArrayElement = function (featuresElement, offerFeaturesArray) {
   // добавляю <li> в нужный блок
   featuresElement.appendChild(documentFragment);
 };
+//  dom-элемент объяления
+var template = document.querySelector('template');
+var offerCardTemplate = template.content.querySelector('article.map__card');
 
 var renderOfferCard = function (object) {
   var authorOfferCardElement = offerCardTemplate.cloneNode(true);
@@ -138,13 +140,13 @@ var renderOfferCard = function (object) {
   // создаю фрагмент для <li> и вложенного в него <img>
   var documentFragment = document.createDocumentFragment();
   for (i = 0; i < offers[0].offer.photos.length; i++) {
-    var newLiElementSecond = document.createElement('li');
+    var newLiElement = document.createElement('li');
     var newImgElementForLi = document.createElement('img');
     newImgElementForLi.src = object.offer.photos[i];
     newImgElementForLi.width = 70;
     newImgElementForLi.height = 70;
-    newLiElementSecond.appendChild(newImgElementForLi);
-    documentFragment.appendChild(newLiElementSecond);
+    newLiElement.appendChild(newImgElementForLi);
+    documentFragment.appendChild(newLiElement);
   }
   // вывожу фрагмент в нужный блок
   picturesElement.appendChild(documentFragment);
@@ -158,148 +160,103 @@ var renderOfferCard = function (object) {
 
 // вызываю ф-цию отрисовки меток
 // renderPins();
-
-var mapPins = document.querySelector('.map__pins');
+var map = document.querySelector('.map');
+var mapPinTemplate = template.content.querySelector('.map__pin');
+var mapPinWidth = mapPinTemplate.offsetWidth;
+var mapPinHeight = mapPinTemplate.offsetHeight;
+var mapPins = map.querySelector('.map__pins');
 // объявляю переменную - карточку со стартовыми значениями, которые будут меняться при клике на каждую новую метку
 var mapCard = renderOfferCard(offers[0]);
 
-// создаю метку на карте
-var createButtonElement = function (object) {
-  var newButtonElement = document.createElement('button');
-  newButtonElement.style.left = (object.location.x + 20) + 'px';
-  newButtonElement.style.top = (object.location.y + 40) + 'px';
-  newButtonElement.className = 'map__pin';
-
-  var newImgElement = document.createElement('img');
-  newImgElement.src = object.author.avatar;
-  newImgElement.width = 40;
-  newImgElement.height = 40;
-  newImgElement.draggable = false;
-
-  newButtonElement.appendChild(newImgElement);
-  // показывает карточку при клике на метку
-  newButtonElement.addEventListener('click', function () {
-    // тут пытаюсь поменять значение переменной, чтобы отрисовывалась нужная картока
-    // mapCard = renderOfferCard(object);
-    mapCard.classList.remove('hidden');
-    // console.log(5);
-    // закрывает карточку при нажатии на esc
-    document.addEventListener('keydown', function (evt) {
-      if (evt.keyCode === ESC_KEYCODE) {
-        mapCard.classList.add('hidden');
-      }
-    });
-  });
-  // обработчик который показывает карточку при фокусе на метке
-  newButtonElement.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
-      mapCard.classList.remove('hidden');
-    }
-  });
-
-  var mapCardClose = mapCard.querySelector('.popup__close');
-  mapCardClose.addEventListener('click', function () {
-    mapCard.classList.add('hidden');
-  });
-
-  mapCardClose.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
-      mapCard.classList.add('hidden');
-    }
-  });
-
-  /* // Оптимизирую с вынесением одинаковых операций в отдельные ф-ции
-  var onPopupEscPress = function(evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
-      closePopup();
-    }
-  };
-
-//показывает карточку при клике на метку
-  var openPopup = function() {
-    // maoCard = renderOfferCard(object);
-    mapCard.classList.remove('hidden');
-    console.log(1);
-    //закрывает карточку при нажатии на esc
-    document.addEventListener('keydown', onPopupEscPress);
-  };
-
-  var closePopup = function() {
-    mapCard.classList.add('hidden');
-    document.removeEventListener('keydown', onPopupEscPress);
-  };
-
-//
-  newButtonElement.addEventListener('click', function() {
-    openPopup();
-  });
-
-// обработчик который показывает карточку при фокусе на метке
-  newButtonElement.addEventListener('keydown', function(evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
-      openPopup();
-    }
-  });
-
-  var mapCardClose = mapCard.querySelector('.popup__close');
-
-//
-  mapCardClose.addEventListener('click',  function() {
+// Оптимизирую с вынесением одинаковых операций в отдельные ф-ции - понадобятся для обработчиков
+var onPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
     closePopup();
-  });
+    // console.log('esc');
+  }
+};
+// показывает карточку при клике на метку
+var openPopup = function () {
+  // mapCard = renderOfferCard(object);
+  mapCard.classList.remove('hidden');
+  // console.log(1);
+  // закрывает карточку при нажатии на esc
+  document.addEventListener('keydown', onPopupEscPress);
+};
+// закрывает попап и убаирает обработчик нажатия на esc
+var closePopup = function () {
+  mapCard.classList.add('hidden');
+  document.removeEventListener('keydown', onPopupEscPress);
+};
 
-//
-  mapCardClose.addEventListener('keydown', function(evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
-      closePopup();
-    }
+// создаю метку на карте
+var createMapPinElement = function (object) {
+  var mapPinElement = mapPinTemplate.cloneNode(true);
+  mapPinElement.style.left = (object.location.x - mapPinWidth) + 'px';
+  mapPinElement.style.top = (object.location.y - mapPinHeight / 2) + 'px';
+  mapPinElement.querySelector('img').src = object.author.avatar;
+  // обработчик клика по метке, показывающий попап (внутри него - обработчик, который при помощи esc закрывает открытый попап)
+  mapPinElement.addEventListener('click', function () {
+    openPopup();
+    // console.log('mapPinElement');
   });
-  */
-  return newButtonElement;
+  return mapPinElement;
 };
 
 // добиваюсь нужного мне количества меток при помощи ф-ции с циклом внутри, вставляю каждую во фрагмент и далее - в DOM
 var renderPins = function () {
   var documentFragment = document.createDocumentFragment();
   for (i = 0; i < offers.length; i++) {
-    documentFragment.appendChild(createButtonElement(offers[i]));
+    documentFragment.appendChild(createMapPinElement(offers[i]));
   }
   mapPins.appendChild(documentFragment);
 };
+// обработчик, который закрывает попап если на нем нажать крестик
+var mapCardClose = mapCard.querySelector('.popup__close');
+
+mapCardClose.addEventListener('click', function () {
+  closePopup();
+  // console.log('mapCardClose');
+});
 
 // ф-ция смены значения атрибута disabled
-var formElementCollection = document.querySelectorAll('.form__element');
+var noticeForm = document.querySelector('.notice__form');
+var formElementCollection = noticeForm.querySelectorAll('.form__element');
+
 var changeDisabledValue = function (boolean) {
-  for (i = 0; i < 11; i++) {
+  for (i = 0; i < formElementCollection.length; i++) {
     formElementCollection[i].disabled = boolean;
   }
 };
+// noticeForm.children.length;
+// alert(document.getElementById('mymenu').childNodes.length);
+// document.getElementById('mymenu').getElementsByTagName('li').length);
 // неактивно в неактивном сотоянии
 changeDisabledValue(true);
 
-var map = document.querySelector('.map');
 var mapPinMain = map.querySelector('.map__pin--main');
+var mapPinMainWidth = mapPinMain.offsetWidth;
+var mapPinMainHeight = mapPinMain.offsetHeight;
 
 var getMapPinMainXY = function (biasX, biasY) {
   var mapPinMainCoordinates = mapPinMain.getBoundingClientRect();
-  document.querySelector('#address').value = mapPinMainCoordinates.left + biasX + ', ' + mapPinMainCoordinates.top + biasY;
+  document.querySelector('#address').value = (mapPinMainCoordinates.left - biasX) + ', ' + (mapPinMainCoordinates.top - biasY);
 };
 // задаю координаты середины метки
-getMapPinMainXY(20, 22);
+getMapPinMainXY(mapPinMainWidth / 2, mapPinMainHeight / 2);
 
 mapPinMain.addEventListener('mouseup', function () {
   // 1 убираю затемнение карты
   map.classList.remove('map--faded');
   // 2 добавляю карту в разметку - стартовый вариант (остается скрытой)
-  document.querySelector('.map').insertBefore(mapCard, document.querySelector('.map__filters-container'));
+  map.insertBefore(mapCard, document.querySelector('.map__filters-container'));
   // 3 показываю похожие метки
   renderPins();
   // 4 убираю затемненность формы и убираю дисэйбл
-  document.querySelector('.notice__form').classList.remove('notice__form--disabled');
+  noticeForm.classList.remove('notice__form--disabled');
   changeDisabledValue(false);
 
   // 5 задаю полю адреса текущий адрес главной метки (учитывая острый конец)
-  getMapPinMainXY(20, 44);
+  getMapPinMainXY(mapPinMainWidth / 2, mapPinMainHeight);
   // --console.log('g')
-
 });
