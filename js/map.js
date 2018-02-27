@@ -176,8 +176,8 @@ var onPopupEscPress = function (evt) {
   }
 };
 // показывает карточку при клике на метку
-var openPopup = function () {
-  // mapCard = renderOfferCard(object);
+var openPopup = function (object) {
+  mapCard = renderOfferCard(object);
   mapCard.classList.remove('hidden');
   // console.log(1);
   // закрывает карточку при нажатии на esc
