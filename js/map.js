@@ -158,8 +158,6 @@ var renderOfferCard = function (object) {
 
 // document.querySelector('.map').insertBefore(renderOfferCard(offers[0]), document.querySelector('.map__filters-container'));
 
-// вызываю ф-цию отрисовки меток
-// renderPins();
 var map = document.querySelector('.map');
 var mapPinTemplate = template.content.querySelector('.map__pin');
 var mapPinWidth = mapPinTemplate.offsetWidth;
@@ -176,8 +174,7 @@ var onPopupEscPress = function (evt) {
   }
 };
 // показывает карточку при клике на метку
-var openPopup = function (object) {
-  mapCard = renderOfferCard(object);
+var openPopup = function () {
   mapCard.classList.remove('hidden');
   // console.log(1);
   // закрывает карточку при нажатии на esc
@@ -197,6 +194,9 @@ var createMapPinElement = function (object) {
   mapPinElement.querySelector('img').src = object.author.avatar;
   // обработчик клика по метке, показывающий попап (внутри него - обработчик, который при помощи esc закрывает открытый попап)
   mapPinElement.addEventListener('click', function () {
+    mapCard = renderOfferCard(object);
+    // console.log(object);
+    // console.log(mapCard);
     openPopup();
     // console.log('mapPinElement');
   });
@@ -228,9 +228,6 @@ var changeDisabledValue = function (boolean) {
     formElementCollection[i].disabled = boolean;
   }
 };
-// noticeForm.children.length;
-// alert(document.getElementById('mymenu').childNodes.length);
-// document.getElementById('mymenu').getElementsByTagName('li').length);
 // неактивно в неактивном сотоянии
 changeDisabledValue(true);
 
