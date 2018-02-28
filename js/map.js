@@ -98,11 +98,12 @@ var getTypeOfHouse = function (offerType) {
   return typeOfHouse;
 };
 //  ф-ция манипуляций с фичами
+
 var getFeaturesArrayElement = function (featuresElement, offerFeaturesArray) {
 
   // удаляю иконки из шаблона, которые идут по умолчанию
   var featureElement = featuresElement.querySelectorAll('.feature');
-  for (i = 0; i <= 5; i++) {
+  for (i = 0; i <= featuresElement.length; i++) {
     featuresElement.removeChild(featureElement[i]);
   }
   // создаю фрагмент для <li>
@@ -118,23 +119,23 @@ var getFeaturesArrayElement = function (featuresElement, offerFeaturesArray) {
 //  dom-элемент объяления
 var template = document.querySelector('template');
 var offerCardTemplate = template.content.querySelector('article.map__card');
+var mapCard = offerCardTemplate.cloneNode(true);
 
 var renderOfferCard = function (object) {
-  var authorOfferCardElement = offerCardTemplate.cloneNode(true);
-  authorOfferCardElement.querySelector('h3').textContent = object.offer.title;
-  authorOfferCardElement.querySelector('small').textContent = object.offer.address;
-  authorOfferCardElement.querySelector('.popup__price').innerHTML = object.offer.price + '&#x20bd;/ночь';
+  mapCard.querySelector('h3').textContent = object.offer.title;
+  mapCard.querySelector('small').textContent = object.offer.address;
+  mapCard.querySelector('.popup__price').innerHTML = object.offer.price + '&#x20bd;/ночь';
   // в блок h4 вывожу тип жилья через вызов ф-ции типа дома
-  authorOfferCardElement.querySelector('h4').textContent = getTypeOfHouse(object.offer.type);
-  authorOfferCardElement.children[6].textContent = object.offer.rooms + ' комнаты для ' + object.offer.guests + ' гостей';
-  authorOfferCardElement.children[7].textContent = 'Заезд после ' + object.offer.checkin + ' , выезд до ' + object.offer.checkout;
-  authorOfferCardElement.children[9].textContent = object.offer.description;
+  mapCard.querySelector('h4').textContent = getTypeOfHouse(object.offer.type);
+  mapCard.children[6].textContent = object.offer.rooms + ' комнаты для ' + object.offer.guests + ' гостей';
+  mapCard.children[7].textContent = 'Заезд после ' + object.offer.checkin + ' , выезд до ' + object.offer.checkout;
+  mapCard.children[9].textContent = object.offer.description;
 
   // вызов ф-ции фич
-  var featuresElement = authorOfferCardElement.querySelector('.popup__features');
+  var featuresElement = mapCard.querySelector('.popup__features');
   getFeaturesArrayElement(featuresElement, object.offer.features);
   // удаляю строку <li> из шаблона
-  var picturesElement = authorOfferCardElement.querySelector('.popup__pictures');
+  var picturesElement = mapCard.querySelector('.popup__pictures');
   var pictureElement = picturesElement.querySelector('li');
   picturesElement.removeChild(pictureElement);
   // создаю фрагмент для <li> и вложенного в него <img>
@@ -150,10 +151,9 @@ var renderOfferCard = function (object) {
   }
   // вывожу фрагмент в нужный блок
   picturesElement.appendChild(documentFragment);
-  authorOfferCardElement.querySelector('.popup__avatar').src = object.author.avatar;
+  mapCard.querySelector('.popup__avatar').src = object.author.avatar;
   // добавляю класс hidden
-  authorOfferCardElement.classList.add('hidden');
-  return authorOfferCardElement;
+  mapCard.classList.add('hidden');
 };
 
 // document.querySelector('.map').insertBefore(renderOfferCard(offers[0]), document.querySelector('.map__filters-container'));
@@ -164,7 +164,6 @@ var mapPinWidth = mapPinTemplate.offsetWidth;
 var mapPinHeight = mapPinTemplate.offsetHeight;
 var mapPins = map.querySelector('.map__pins');
 // объявляю переменную - карточку со стартовыми значениями, которые будут меняться при клике на каждую новую метку
-var mapCard = renderOfferCard(offers[0]);
 
 // Оптимизирую с вынесением одинаковых операций в отдельные ф-ции - понадобятся для обработчиков
 var onPopupEscPress = function (evt) {
@@ -194,7 +193,7 @@ var createMapPinElement = function (object) {
   mapPinElement.querySelector('img').src = object.author.avatar;
   // обработчик клика по метке, показывающий попап (внутри него - обработчик, который при помощи esc закрывает открытый попап)
   mapPinElement.addEventListener('click', function () {
-    mapCard = renderOfferCard(object);
+    renderOfferCard(object);
     // console.log(object);
     // console.log(mapCard);
     openPopup();
@@ -246,7 +245,10 @@ mapPinMain.addEventListener('mouseup', function () {
   // 1 убираю затемнение карты
   map.classList.remove('map--faded');
   // 2 добавляю карту в разметку - стартовый вариант (остается скрытой)
-  map.insertBefore(mapCard, document.querySelector('.map__filters-container'));
+  // (1)
+  // map.insertBefore(renderOfferCard(offers[0]), document.querySelector('.map__filters-container'));
+  // (2)
+  // map.insertBefore(mapCard, document.querySelector('.map__filters-container'));
   // 3 показываю похожие метки
   renderPins();
   // 4 убираю затемненность формы и убираю дисэйбл
