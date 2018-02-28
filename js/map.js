@@ -248,7 +248,7 @@ mapPinMain.addEventListener('mouseup', function () {
   // (1)
   // map.insertBefore(renderOfferCard(offers[0]), document.querySelector('.map__filters-container'));
   // (2)
-  // map.insertBefore(mapCard, document.querySelector('.map__filters-container'));
+  map.insertBefore(mapCard, document.querySelector('.map__filters-container'));
   // 3 показываю похожие метки
   renderPins();
   // 4 убираю затемненность формы и убираю дисэйбл
