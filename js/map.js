@@ -97,18 +97,39 @@ var getTypeOfHouse = function (offerType) {
   }
   return typeOfHouse;
 };
-//  ф-ция манипуляций с фичами
+//  ф-ция манипуляций с фичами (новый вариант)
 
-var getFeaturesArrayElement = function (featuresElement, offerFeaturesArray) {
+var filterFeatures = function (featuresElement, offerFeaturesArray) {
+  var featuresElements = featuresElement.querySelectorAll('.feature');
+  var identifier;
+  // -- var documentFragment = document.createDocumentFragment();
+  // должен быть один цикл. Будешь проверять наличие элемента в массиве с помощью indexOf
+  // и используя classlist.toggle добавлять/удалять класс hidden
+  for (i = 0; i < featuresElement.length; i++) { // обходим все элементы фич
+    // берем значение атрибута "class" фичи (это строка), делим ее на две части по сочетанию символов '--' и  записываем в identifier
+    // точнее, после деления получается массив их двух строк - берем вторую строку, записываем в identifier
+    identifier = featuresElements[i].getAttribute('class').split('--')[1];
+    // потом у текущего элемента фичи добавляем/удаляем класс hidden
+    // в зависимости от того, есть ли в массиве offerFeaturesArray строка, которую записали в identifier
+    // indexOf вернет номер элемента в массиве, если что-то найдет, либо -1, если не найдет
+    featuresElements[i].classList.toggle('hidden', offerFeaturesArray.indexOf(identifier) > -1);
+    // -- documentFragment.appendChild(featuresElements[i]);
+  }
+  // console.log(featuresElements);
+  // -- featuresElement.appendChild(documentFragment);
+};
+
+/* // прежний вариант
+var filterFeatures= function (featuresElement, offerFeaturesArray) {
 
   // удаляю иконки из шаблона, которые идут по умолчанию
-  var featureElement = featuresElement.querySelectorAll('.feature');
-  for (i = 0; i <= featuresElement.length; i++) {
+ var featureElement = featuresElement.querySelectorAll('.feature');
+ for (i = 0; i <= featuresElement.length; i++) {
     featuresElement.removeChild(featureElement[i]);
   }
   // создаю фрагмент для <li>
   var documentFragment = document.createDocumentFragment();
-  for (i = 0; i < offerFeaturesArray.length; i++) {
+ for (i = 0; i < offerFeaturesArray.length; i++) {
     var newFeatureElement = document.createElement('li');
     newFeatureElement.className = 'feature feature--' + offerFeaturesArray[i];
     documentFragment.appendChild(newFeatureElement);
@@ -116,10 +137,14 @@ var getFeaturesArrayElement = function (featuresElement, offerFeaturesArray) {
   // добавляю <li> в нужный блок
   featuresElement.appendChild(documentFragment);
 };
+*/
 //  dom-элемент объяления
 var template = document.querySelector('template');
 var offerCardTemplate = template.content.querySelector('article.map__card');
 var mapCard = offerCardTemplate.cloneNode(true);
+mapCard.classList.add('hidden');
+var featuresElement = mapCard.querySelector('.popup__features');
+
 
 var renderOfferCard = function (object) {
   mapCard.querySelector('h3').textContent = object.offer.title;
@@ -132,12 +157,11 @@ var renderOfferCard = function (object) {
   mapCard.children[9].textContent = object.offer.description;
 
   // вызов ф-ции фич
-  var featuresElement = mapCard.querySelector('.popup__features');
-  getFeaturesArrayElement(featuresElement, object.offer.features);
-  // удаляю строку <li> из шаблона
+  filterFeatures(featuresElement, object.offer.features);
+  // подчищаю список фотографий в шаблонной карточке
   var picturesElement = mapCard.querySelector('.popup__pictures');
-  var pictureElement = picturesElement.querySelector('li');
-  picturesElement.removeChild(pictureElement);
+  // var pictureElement = picturesElement.querySelector('li');
+  picturesElement.innerHTML = '';
   // создаю фрагмент для <li> и вложенного в него <img>
   var documentFragment = document.createDocumentFragment();
   for (i = 0; i < offers[0].offer.photos.length; i++) {
