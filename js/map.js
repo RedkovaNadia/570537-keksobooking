@@ -102,7 +102,6 @@ var getTypeOfHouse = function (offerType) {
 var filterFeatures = function (featuresElement, offerFeaturesArray) {
   var featuresElements = featuresElement.querySelectorAll('.feature');
   var identifier;
-  // -- var documentFragment = document.createDocumentFragment();
   // должен быть один цикл. Будешь проверять наличие элемента в массиве с помощью indexOf
   // и используя classlist.toggle добавлять/удалять класс hidden
   for (i = 0; i < featuresElement.length; i++) { // обходим все элементы фич
@@ -113,10 +112,8 @@ var filterFeatures = function (featuresElement, offerFeaturesArray) {
     // в зависимости от того, есть ли в массиве offerFeaturesArray строка, которую записали в identifier
     // indexOf вернет номер элемента в массиве, если что-то найдет, либо -1, если не найдет
     featuresElements[i].classList.toggle('hidden', offerFeaturesArray.indexOf(identifier) > -1);
-    // -- documentFragment.appendChild(featuresElements[i]);
   }
   // console.log(featuresElements);
-  // -- featuresElement.appendChild(documentFragment);
 };
 
 /* // прежний вариант
