@@ -7,6 +7,9 @@ var CHECKIN_TIME = ['12:00', '13:00', '14:00'];
 var CHECKOUT_TIME = ['12:00', '13:00', '14:00'];
 var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
+// переменные с номерами клавиш
+var ESC_KEYCODE = 27;
+// var ENTER_KEYCODE = 13;
 
 // функция, возвращающая рандомный индекс массива
 function getRandomIndex(number) {
@@ -72,40 +75,9 @@ for (var i = 0; i < NUMBER_OF_OFFERS; i++) {
   offers.push(getOfferObject(i));
 }
 // убираю класс у блока
-document.querySelector('.map').classList.remove('map--faded');
+// document.querySelector('.map').classList.remove('map--faded');
 
-// создаю метку на карте
-var mapPins = document.querySelector('.map__pins');
-
-
-var createButtonElement = function (object) {
-  var newButtonElement = document.createElement('button');
-  newButtonElement.style.left = (object.location.x + 20) + 'px';
-  newButtonElement.style.top = (object.location.y + 40) + 'px';
-  newButtonElement.className = 'map__pin';
-
-  var newImgElement = document.createElement('img');
-  newImgElement.src = object.author.avatar;
-  newImgElement.width = 40;
-  newImgElement.height = 40;
-  newImgElement.draggable = false;
-
-  newButtonElement.appendChild(newImgElement);
-  return newButtonElement;
-};
-
-// добиваюсь нужного мне количества меток при помощи ф-ции с циклом внутри, вставляю каждую во фрагмент и далее - в DOM
-var renderPins = function () {
-  var documentFragment = document.createDocumentFragment();
-  for (i = 0; i < offers.length; i++) {
-    documentFragment.appendChild(createButtonElement(offers[i]));
-  }
-  mapPins.appendChild(documentFragment);
-};
-
-//  dom-элемент объяления
-
-var offerCardTemplate = document.querySelector('template').content.querySelector('article.map__card');
+//  начинаю работу с dom-элементом объяления
 
 // ф-ция, проверяющая тип жилища
 var getTypeOfHouse = function (offerType) {
@@ -125,62 +97,174 @@ var getTypeOfHouse = function (offerType) {
   }
   return typeOfHouse;
 };
-//  ф-ция манипуляций с фичами
-var getFeaturesArrayElement = function (featuresElement, offerFeaturesArray) {
+//  ф-ция манипуляций с фичами (новый вариант)
 
-  // удаляю иконки из шаблона, которые идут по умолчанию
-  var featureElement = featuresElement.querySelectorAll('.feature');
-  for (i = 0; i <= 5; i++) {
-    featuresElement.removeChild(featureElement[i]);
+var filterFeatures = function (featuresElement, offerFeaturesArray) {
+  var featuresElements = featuresElement.querySelectorAll('.feature');
+  var identifier;
+  // должен быть один цикл. Будешь проверять наличие элемента в массиве с помощью indexOf
+  // и используя classlist.toggle добавлять/удалять класс hidden
+  for (i = 0; i < featuresElements.length; i++) { // обходим все элементы фич
+    // берем значение атрибута "class" фичи (это строка), делим ее на две части по сочетанию символов '--' и  записываем в identifier
+    // точнее, после деления получается массив их двух строк - берем вторую строку, записываем в identifier
+    identifier = featuresElements[i].getAttribute('class').split('--')[1];
+    // потом у текущего элемента фичи добавляем/удаляем класс hidden
+    // в зависимости от того, есть ли в массиве offerFeaturesArray строка, которую записали в identifier
+    // indexOf вернет номер элемента в массиве, если что-то найдет, либо -1, если не найдет
+    featuresElements[i].classList.toggle('hidden', offerFeaturesArray.indexOf(identifier) > -1);
   }
-  // создаю фрагмент для <li>
-  var documentFragment = document.createDocumentFragment();
-  for (i = 0; i < offerFeaturesArray.length; i++) {
-    var newFeatureElement = document.createElement('li');
-    newFeatureElement.className = 'feature feature--' + offerFeaturesArray[i];
-    documentFragment.appendChild(newFeatureElement);
-  }
-  // добавляю <li> в нужный блок
-  featuresElement.appendChild(documentFragment);
+  // console.log(featuresElements);
 };
 
+//  dom-элемент объяления
+var template = document.querySelector('template');
+var offerCardTemplate = template.content.querySelector('article.map__card');
+var mapCard = offerCardTemplate.cloneNode(true);
+mapCard.classList.add('hidden');
+var featuresElement = mapCard.querySelector('.popup__features');
+
+
 var renderOfferCard = function (object) {
-  var authorOfferCardElement = offerCardTemplate.cloneNode(true);
-  authorOfferCardElement.querySelector('h3').textContent = object.offer.title;
-  authorOfferCardElement.querySelector('small').textContent = object.offer.address;
-  authorOfferCardElement.querySelector('.popup__price').innerHTML = object.offer.price + '&#x20bd;/ночь';
+  mapCard.querySelector('h3').textContent = object.offer.title;
+  mapCard.querySelector('small').textContent = object.offer.address;
+  mapCard.querySelector('.popup__price').innerHTML = object.offer.price + '&#x20bd;/ночь';
   // в блок h4 вывожу тип жилья через вызов ф-ции типа дома
-  authorOfferCardElement.querySelector('h4').textContent = getTypeOfHouse(object.offer.type);
-  authorOfferCardElement.children[6].textContent = object.offer.rooms + ' комнаты для ' + object.offer.guests + ' гостей';
-  authorOfferCardElement.children[7].textContent = 'Заезд после ' + object.offer.checkin + ' , выезд до ' + object.offer.checkout;
-  authorOfferCardElement.children[9].textContent = object.offer.description;
+  mapCard.querySelector('h4').textContent = getTypeOfHouse(object.offer.type);
+  mapCard.children[6].textContent = object.offer.rooms + ' комнаты для ' + object.offer.guests + ' гостей';
+  mapCard.children[7].textContent = 'Заезд после ' + object.offer.checkin + ' , выезд до ' + object.offer.checkout;
+  mapCard.children[9].textContent = object.offer.description;
 
   // вызов ф-ции фич
-  var featuresElement = authorOfferCardElement.querySelector('.popup__features');
-  getFeaturesArrayElement(featuresElement, object.offer.features);
-  // удаляю строку <li> из шаблона
-  var picturesElement = authorOfferCardElement.querySelector('.popup__pictures');
-  var pictureElement = picturesElement.querySelector('li');
-  picturesElement.removeChild(pictureElement);
+  filterFeatures(featuresElement, object.offer.features);
+  // подчищаю список фотографий в шаблонной карточке
+  var picturesElement = mapCard.querySelector('.popup__pictures');
+  // var pictureElement = picturesElement.querySelector('li');
+  picturesElement.innerHTML = '';
   // создаю фрагмент для <li> и вложенного в него <img>
   var documentFragment = document.createDocumentFragment();
   for (i = 0; i < offers[0].offer.photos.length; i++) {
-    var newLiElementSecond = document.createElement('li');
+    var newLiElement = document.createElement('li');
     var newImgElementForLi = document.createElement('img');
     newImgElementForLi.src = object.offer.photos[i];
     newImgElementForLi.width = 70;
     newImgElementForLi.height = 70;
-    newLiElementSecond.appendChild(newImgElementForLi);
-    documentFragment.appendChild(newLiElementSecond);
+    newLiElement.appendChild(newImgElementForLi);
+    documentFragment.appendChild(newLiElement);
   }
   // вывожу фрагмент в нужный блок
   picturesElement.appendChild(documentFragment);
-  authorOfferCardElement.querySelector('.popup__avatar').src = object.author.avatar;
-  return authorOfferCardElement;
+  mapCard.querySelector('.popup__avatar').src = object.author.avatar;
+  // добавляю класс hidden
+  mapCard.classList.add('hidden');
 };
 
-document.querySelector('.map').insertBefore(renderOfferCard(offers[0]), document.querySelector('.map__filters-container'));
+// document.querySelector('.map').insertBefore(renderOfferCard(offers[0]), document.querySelector('.map__filters-container'));
 
-// вызываю ф-цию отрисовки меток
-renderPins();
+var map = document.querySelector('.map');
+var mapPinTemplate = template.content.querySelector('.map__pin');
+var mapPinWidth = mapPinTemplate.offsetWidth;
+var mapPinHeight = mapPinTemplate.offsetHeight;
+var mapPins = map.querySelector('.map__pins');
 
+// Оптимизирую с вынесением одинаковых операций в отдельные ф-ции - понадобятся для обработчиков
+// объявляю переменную активного элемента
+var activeMapPinElement;
+
+var onPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closePopup();
+    // console.log('esc');
+  }
+};
+// показывает карточку при клике на метку
+var openPopup = function () {
+  mapCard.classList.remove('hidden');
+  // console.log('openPopup');
+  // закрывает карточку при нажатии на esc
+  document.addEventListener('keydown', onPopupEscPress);
+};
+// закрывает попап и убаирает обработчик нажатия на esc
+var closePopup = function () {
+  mapCard.classList.add('hidden');
+  // обнуляю значение переменной активного элемента
+  activeMapPinElement = null;
+  document.removeEventListener('keydown', onPopupEscPress);
+  // console.log('closePopup');
+};
+
+// создаю метку на карте
+var createMapPinElement = function (object) {
+  var mapPinElement = mapPinTemplate.cloneNode(true);
+  mapPinElement.style.left = (object.location.x - mapPinWidth) + 'px';
+  mapPinElement.style.top = (object.location.y - mapPinHeight / 2) + 'px';
+  mapPinElement.querySelector('img').src = object.author.avatar;
+  // обработчик клика по метке, показывающий попап (внутри него - обработчик, который при помощи esc закрывает открытый попап)
+  mapPinElement.addEventListener('click', function () {
+    if (mapPinElement !== activeMapPinElement) {
+      renderOfferCard(object);
+      // console.log(object);
+      // console.log(mapCard);
+      openPopup();
+      activeMapPinElement = mapPinElement;
+      // console.log('mapPinClick');
+      // console.log(evt.target);
+      // console.log(evt);
+    }
+  });
+  return mapPinElement;
+};
+
+// добиваюсь нужного мне количества меток при помощи ф-ции с циклом внутри, вставляю каждую во фрагмент и далее - в DOM
+var renderPins = function () {
+  var documentFragment = document.createDocumentFragment();
+  for (i = 0; i < offers.length; i++) {
+    documentFragment.appendChild(createMapPinElement(offers[i]));
+  }
+  mapPins.appendChild(documentFragment);
+};
+// обработчик, который закрывает попап если на нем нажать крестик
+var mapCardClose = mapCard.querySelector('.popup__close');
+
+mapCardClose.addEventListener('click', function () {
+  closePopup();
+  // console.log('mapCardClose');
+});
+
+// ф-ция смены значения атрибута disabled
+var noticeForm = document.querySelector('.notice__form');
+var formElementCollection = noticeForm.querySelectorAll('.form__element');
+
+var changeDisabledValue = function (boolean) {
+  for (i = 0; i < formElementCollection.length; i++) {
+    formElementCollection[i].disabled = boolean;
+  }
+};
+// неактивно в неактивном сотоянии
+changeDisabledValue(true);
+
+var mapPinMain = map.querySelector('.map__pin--main');
+var mapPinMainWidth = mapPinMain.offsetWidth;
+var mapPinMainHeight = mapPinMain.offsetHeight;
+
+var getMapPinMainXY = function (biasX, biasY) {
+  var mapPinMainCoordinates = mapPinMain.getBoundingClientRect();
+  document.querySelector('#address').value = (mapPinMainCoordinates.left - biasX) + ', ' + (mapPinMainCoordinates.top - biasY);
+};
+// задаю координаты середины метки
+getMapPinMainXY(mapPinMainWidth / 2, mapPinMainHeight / 2);
+
+mapPinMain.addEventListener('mouseup', function () {
+  // 1 убираю затемнение карты
+  map.classList.remove('map--faded');
+  // 2 добавляю карту в разметку - стартовый вариант (остается скрытой)
+  map.insertBefore(mapCard, document.querySelector('.map__filters-container'));
+  // 3 показываю похожие метки
+  renderPins();
+  // 4 убираю затемненность формы и убираю дисэйбл
+  noticeForm.classList.remove('notice__form--disabled');
+  changeDisabledValue(false);
+
+  // 5 задаю полю адреса текущий адрес главной метки (учитывая острый конец)
+  getMapPinMainXY(mapPinMainWidth / 2, mapPinMainHeight);
+  // --console.log('g')
+});
