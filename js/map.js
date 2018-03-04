@@ -267,4 +267,11 @@ mapPinMain.addEventListener('mouseup', function () {
   // 5 задаю полю адреса текущий адрес главной метки (учитывая острый конец)
   getMapPinMainXY(mapPinMainWidth / 2, mapPinMainHeight);
   // --console.log('g')
+  console.log(formElementCollection[1].validity);
+
+  formElementCollection[5].addEventListener('change', function () {
+    if (formElementCollection[5].getElementById('timein').options[0].selected === true) {
+      formElementCollection[5].getElementById('timeout').options[1].selected = true;
+    }
+  });
 });
