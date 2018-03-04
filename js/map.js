@@ -233,6 +233,16 @@ mapCardClose.addEventListener('click', function () {
 // ф-ция смены значения атрибута disabled
 var noticeForm = document.querySelector('.notice__form');
 var formElementCollection = noticeForm.querySelectorAll('.form__element');
+var timeinSelect = noticeForm.querySelector('#timein');
+var timeoutSelect = noticeForm.querySelector('#timeout');
+
+var changeSelectValue = function (firstSelect, secondSelect) {
+  for (i = 0; i < 3; i++) {
+    if (firstSelect.options[i].selected === true) {
+      secondSelect.value = firstSelect.options[i].value;
+    }
+  }
+};
 
 var changeDisabledValue = function (boolean) {
   for (i = 0; i < formElementCollection.length; i++) {
@@ -268,10 +278,8 @@ mapPinMain.addEventListener('mouseup', function () {
   getMapPinMainXY(mapPinMainWidth / 2, mapPinMainHeight);
   // --console.log('g')
   // console.log(formElementCollection[1].validity);
-
-  formElementCollection[5].addEventListener('change', function () {
-    if (formElementCollection[5].getElementById('timein').options[0].selected === true) {
-      formElementCollection[5].getElementById('timeout').options[1].selected = true;
-    }
+  // обработчик, меняющий значения Select
+  timeinSelect.addEventListener('change', function () {
+    changeSelectValue(timeinSelect, timeoutSelect);
   });
 });
