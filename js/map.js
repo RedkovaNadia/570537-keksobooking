@@ -235,14 +235,58 @@ var noticeForm = document.querySelector('.notice__form');
 var formElementCollection = noticeForm.querySelectorAll('.form__element');
 var timeinSelect = noticeForm.querySelector('#timein');
 var timeoutSelect = noticeForm.querySelector('#timeout');
+var typeSelect = noticeForm.querySelector('#type');
+var priceInput = noticeForm.querySelector('#price');
 
+//  ф-ция, меняющая значение второго селекта в зависимости от значения первого
 var changeSelectValue = function (firstSelect, secondSelect) {
-  for (i = 0; i < 3; i++) {
-    if (firstSelect.options[i].selected === true) {
-      secondSelect.value = firstSelect.options[i].value;
-    }
-  }
+  secondSelect.value = firstSelect.value;
+  // console.log(firstSelect.value);
 };
+// ф-ция, задающая полю input-price аттрибут минимального значения в зависимости от value соответствующего селекта
+var setInputAttribute = function (select, input) {
+  if (select.value === 'flat') {
+    priceInput.setAttribute('min', '1000');
+  }
+  if (select.value === 'bungalo') {
+    input.setAttribute('min', '0');
+  }
+
+  if (select.value === 'house') {
+    input.setAttribute('min', '5000');
+  }
+
+  if (select.value === 'palace') {
+    input.setAttribute('min', '10000');
+  }
+  // console.log(select.value);
+};
+
+/* // решение той же задачи через switch
+var setInputAttribute = function (select, input) {
+var priceNumber;
+
+  switch (select.value) {
+    case 'flat':
+    priceNumber = '1000';
+    break;
+
+    case 'bungalo':
+    priceNumber = '0';
+    break;
+
+    case 'house':
+    priceNumber = '5000';
+    break;
+
+    case 'house':
+    priceNumber = '10000';
+    break;
+  }
+  input.setAttribute('min', priceNumber);
+  console.log(select.value);
+};
+*/
 
 var changeDisabledValue = function (boolean) {
   for (i = 0; i < formElementCollection.length; i++) {
@@ -276,10 +320,13 @@ mapPinMain.addEventListener('mouseup', function () {
 
   // 5 задаю полю адреса текущий адрес главной метки (учитывая острый конец)
   getMapPinMainXY(mapPinMainWidth / 2, mapPinMainHeight);
-  // --console.log('g')
   // console.log(formElementCollection[1].validity);
   // обработчик, меняющий значения Select
   timeinSelect.addEventListener('change', function () {
     changeSelectValue(timeinSelect, timeoutSelect);
+  });
+  // обработчик, задающий полю input-price аттрибут минимального значения в зависимости от value соответствующего селекта
+  typeSelect.addEventListener('change', function () {
+    setInputAttribute(typeSelect, priceInput);
   });
 });
