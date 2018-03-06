@@ -239,54 +239,62 @@ var typeSelect = noticeForm.querySelector('#type');
 var priceInput = noticeForm.querySelector('#price');
 
 //  ф-ция, меняющая значение второго селекта в зависимости от значения первого
-var changeSelectValue = function (firstSelect, secondSelect) {
+var changeTimeSelectValue = function (firstSelect, secondSelect) {
   secondSelect.value = firstSelect.value;
   // console.log(firstSelect.value);
 };
 // ф-ция, задающая полю input-price аттрибут минимального значения в зависимости от value соответствующего селекта
+// решение задачи через switch
 var setInputAttribute = function (select, input) {
-  if (select.value === 'flat') {
-    priceInput.setAttribute('min', '1000');
-  }
-  if (select.value === 'bungalo') {
-    input.setAttribute('min', '0');
-  }
-
-  if (select.value === 'house') {
-    input.setAttribute('min', '5000');
-  }
-
-  if (select.value === 'palace') {
-    input.setAttribute('min', '10000');
-  }
-  // console.log(select.value);
-};
-
-/* // решение той же задачи через switch
-var setInputAttribute = function (select, input) {
-var priceNumber;
+  var priceNumber;
 
   switch (select.value) {
     case 'flat':
-    priceNumber = '1000';
-    break;
+      priceNumber = '1000';
+      break;
 
     case 'bungalo':
-    priceNumber = '0';
-    break;
+      priceNumber = '0';
+      break;
 
     case 'house':
-    priceNumber = '5000';
-    break;
+      priceNumber = '5000';
+      break;
 
-    case 'house':
-    priceNumber = '10000';
-    break;
+    case 'palace':
+      priceNumber = '10000';
+      break;
   }
-  input.setAttribute('min', priceNumber);
-  console.log(select.value);
+  input.min = priceNumber;
+  // console.log(select.value);
 };
-*/
+var roomNumberSelect = noticeForm.querySelector('#room_number');
+var capacitySelect = noticeForm.querySelector('#capacity');
+var changeDisabledStation = function () {
+  switch (roomNumberSelect.value) {
+    case '1':
+      capacitySelect.options[0].disabled = true;
+      capacitySelect.options[1].disabled = true;
+      capacitySelect.options[3].disabled = true;
+      break;
+
+    case '2':
+      capacitySelect.options[0].disabled = true;
+      capacitySelect.options[3].disabled = true;
+      break;
+
+    case '3':
+      capacitySelect.options[3].disabled = true;
+      break;
+
+    case '100':
+      capacitySelect.options[0].disabled = true;
+      capacitySelect.options[1].disabled = true;
+      capacitySelect.options[2].disabled = true;
+      break;
+  }
+  // console.log(select.value);
+};
 
 var changeDisabledValue = function (boolean) {
   for (i = 0; i < formElementCollection.length; i++) {
@@ -323,10 +331,19 @@ mapPinMain.addEventListener('mouseup', function () {
   // console.log(formElementCollection[1].validity);
   // обработчик, меняющий значения Select
   timeinSelect.addEventListener('change', function () {
-    changeSelectValue(timeinSelect, timeoutSelect);
+    changeTimeSelectValue(timeinSelect, timeoutSelect);
   });
   // обработчик, задающий полю input-price аттрибут минимального значения в зависимости от value соответствующего селекта
+  setInputAttribute(typeSelect, priceInput);
   typeSelect.addEventListener('change', function () {
     setInputAttribute(typeSelect, priceInput);
   });
+  changeDisabledStation();
+  roomNumberSelect.addEventListener('change', function () {
+    changeDisabledStation();
+  });
+  // console.log(capacitySelect);
+  // console.log(roomNumberSelect);
+  // console.log(capacitySelect.options[0].disabled);
+  // console.log(roomNumberSelect.value);
 });
