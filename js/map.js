@@ -268,41 +268,32 @@ var setInputAttribute = function (select, input) {
   input.min = priceNumber;
   // console.log(select.value);
 };
-var roomNumberSelect = noticeForm.querySelector('#room_number');
-var capacitySelect = noticeForm.querySelector('#capacity');
-var changeDisabledStation = function () {
-  switch (roomNumberSelect.value) {
-    case '1':
-      capacitySelect.options[0].disabled = true;
-      capacitySelect.options[1].disabled = true;
-      capacitySelect.options[3].disabled = true;
-      break;
 
-    case '2':
-      capacitySelect.options[0].disabled = true;
-      capacitySelect.options[3].disabled = true;
-      break;
-
-    case '3':
-      capacitySelect.options[3].disabled = true;
-      break;
-
-    case '100':
-      capacitySelect.options[0].disabled = true;
-      capacitySelect.options[1].disabled = true;
-      capacitySelect.options[2].disabled = true;
-      break;
-  }
-  // console.log(select.value);
-};
-
-var changeDisabledValue = function (boolean) {
-  for (i = 0; i < formElementCollection.length; i++) {
-    formElementCollection[i].disabled = boolean;
+var changeDisabledValue = function (array, boolean) {
+  for (i = 0; i < array.length; i++) {
+    array[i].disabled = boolean;
   }
 };
 // неактивно в неактивном сотоянии
 changeDisabledValue(true);
+
+var roomNumberSelect = noticeForm.querySelector('#room_number');
+var capacitySelect = noticeForm.querySelector('#capacity');
+
+var changeCapacityFromRooms = function () {
+  var roomsNumber = roomNumberSelect.value;
+  var guestsNumbers = capacitySelect.options;
+
+  for (i = 0; i < guestsNumbers.length; i++) {
+    if (roomsNumber === '100') {
+      guestsNumbers[i].disabled = guestsNumbers[i].value !== '100';
+      capacitySelect.value = '0';
+    } else {
+      guestsNumbers[i].disabled = (guestsNumbers[i].value > roomsNumber || guestsNumbers[i].value === '0');
+      capacitySelect.value = roomsNumber;
+    }
+  }
+};
 
 var mapPinMain = map.querySelector('.map__pin--main');
 var mapPinMainWidth = mapPinMain.offsetWidth;
@@ -324,7 +315,7 @@ mapPinMain.addEventListener('mouseup', function () {
   renderPins();
   // 4 убираю затемненность формы и убираю дисэйбл
   noticeForm.classList.remove('notice__form--disabled');
-  changeDisabledValue(false);
+  changeDisabledValue(formElementCollection, false);
 
   // 5 задаю полю адреса текущий адрес главной метки (учитывая острый конец)
   getMapPinMainXY(mapPinMainWidth / 2, mapPinMainHeight);
@@ -338,9 +329,10 @@ mapPinMain.addEventListener('mouseup', function () {
   typeSelect.addEventListener('change', function () {
     setInputAttribute(typeSelect, priceInput);
   });
-  changeDisabledStation();
+  // changeDisabledValue(capacitySelect, false);
+  changeCapacityFromRooms();
   roomNumberSelect.addEventListener('change', function () {
-    changeDisabledStation();
+    changeCapacityFromRooms();
   });
   // console.log(capacitySelect);
   // console.log(roomNumberSelect);
